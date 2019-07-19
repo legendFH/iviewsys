@@ -5,6 +5,11 @@ import App from './App'
 import router from './router'
 import store from './store'
 import iView from 'iview'
+import Vuetify from 'vuetify'
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+
+Vue.use(ElementUI);
 import i18n from '@/locale'
 import config from '@/config'
 import importDirective from '@/directive'
@@ -12,13 +17,14 @@ import installPlugin from '@/plugin'
 import 'iview/dist/styles/iview.css'
 import './index.less'
 import '@/assets/icons/iconfont.css'
-// 实际打包时应该不引入mock
 /* eslint-disable */
 if (process.env.NODE_ENV !== 'production') require('@/mock')
-
 Vue.use(iView, {
   i18n: (key, value) => i18n.t(key, value)
 })
+import 'vuetify/dist/vuetify.min.css' // Ensure you are using css-loader
+// 实际打包时应该不引入mock
+Vue.use(Vuetify)
 /**
  * @description 注册admin内置插件
  */

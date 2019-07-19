@@ -127,7 +127,17 @@
             }
           }
         ],
-        data6: [],
+        data6: [{
+          courseid : 1,
+          coursename : "aaa",
+          coursekind:"bbb",
+          coursetype:"ccc",
+          credit: "ddd"
+
+
+        },
+
+        ],
         searchValue: '',
         loading: false,
         addModel: false,
@@ -186,7 +196,7 @@
       },
 
       //查询方法
-      changePage() {
+     /* changePage() {
         this.loading = true
         const url = '/searchCourse'
         this.$axios.get(url, {params: {name: this.searchValue, page: this.current, limit: this.pageSize}})
@@ -200,7 +210,7 @@
             console.log(res)
           })
       },
-
+*/
       //添加修改方法
       addAndUpdate() {
         this.$refs.formItem.validate((valid) => {
