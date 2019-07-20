@@ -50,6 +50,10 @@
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize">Reset</v-btn>
       </template>
+      <template v-slot:pageText="props">
+        第{{ parseInt(props.pageStop /props.itemsLength) +1}}页，共{{ Math.ceil(props.itemsLength /5)}}页 {{ props.itemsLength }}条数据
+        <!--        Lignes {{ props.pageStart }} - {{ props.pageStop }} de {{ props.itemsLength }}-->
+      </template>
     </v-data-table>
     <v-dialog v-model="dialog" max-width="500px">
       <template v-slot:activator="{ on }">
@@ -221,7 +225,8 @@
 
       deleteItem (item) {
         const index = this.desserts.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
+        confirm('确认删除?') && this.desserts.splice(index, 1)
+        this.$Message.success('删除成功');
       },
 
       close () {
@@ -241,8 +246,10 @@
       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          this.$Message.success('操作成功');
         } else {
           this.desserts.push(this.editedItem)
+          this.$Message.success('操作成功');
         }
         this.close()
       }

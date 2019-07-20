@@ -1,30 +1,35 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <div>
     <v-toolbar flat color="white">
-      <v-toolbar-title>My CRUD</v-toolbar-title>
+      <v-toolbar-title>收费类型表</v-toolbar-title>
       <v-divider
         class="mx-2"
         inset
         vertical
       ></v-divider>
       <v-spacer></v-spacer>
-      <Button @click="handleAdd" type="success">
-        <Icon type="ios-add"/>
-        添加
-      </Button>&nbsp;
+      <v-text-field
+        v-model="searchName"
+        append-icon="search"
+        label=" 输入关键词搜索"
+        single-line
+        hide-details
+      ></v-text-field>
 
     </v-toolbar>
+
     <v-data-table
       :headers="headers"
       :items="desserts"
+      :search="searchName"
       class="elevation-1"
     >
       <template v-slot:items="props">
         <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ props.item.calories }}</td>
-        <td class="text-xs-right">{{ props.item.fat }}</td>
-        <td class="text-xs-right">{{ props.item.carbs }}</td>
-        <td class="text-xs-right">{{ props.item.protein }}</td>
+        <td class="text-xs-left">{{ props.item.calories }}</td>
+        <td class="text-xs-left">{{ props.item.fat }}</td>
+        <td class="text-xs-left">{{ props.item.carbs }}</td>
+
         <td class="justify-center layout px-0">
           <v-icon
             small
@@ -44,83 +49,90 @@
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize">Reset</v-btn>
       </template>
-    </v-data-table>
-    <Modal v-model="addModel" :title="title" footer-hide @on-cancel="addCanael">
-      <Form :model="formItem" ref="formItem" :label-width="80" >
-        <FormItem label="课程名称" prop="coursename">
-          <Input :disabled="disable" v-model="formItem.coursename" placeholder="请输入课程名称"></Input>
-        </FormItem>
-        <FormItem label="所属科目">
-          <Select v-model="formItem.coursekind">
-            <Option value="理科">理科</Option>
-            <Option value="文科">文科</Option>
-          </Select>
-        </FormItem>
-        <FormItem label="课程类型">
-          <Select v-model="formItem.coursetype">
-            <Option value="必修">必修</Option>
-            <Option value="选修">选修</Option>
-          </Select>
-        </FormItem>
-        <FormItem label="学分" prop="credit">
-          <Input v-model="formItem.credit" placeholder="请输入学分"></Input>
-        </FormItem>
-        <FormItem>
-          <Button @click="addAndUpdate" type="primary">Submit</Button>
-          <Button style="margin-left: 8px">Cancel</Button>
-        </FormItem>
-      </Form>
-    </Modal>
-  </div>
+      <template v-slot:pageText="props">
+        第{{ parseInt(props.pageStop /props.itemsLength) +1}}页，共{{ Math.ceil(props.itemsLength /5)}}页 {{ props.itemsLength }}条数据
+        <!--        Lignes {{ props.pageStart }} - {{ props.pageStop }} de {{ props.itemsLength }}-->
+      </template>
 
+    </v-data-table>
+    <v-dialog v-model="dialog" max-width="500px">
+      <template v-slot:activator="{ on }">
+        <v-btn color="primary" dark class="mb-2" v-on="on">新增</v-btn>
+
+      </template>
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{ formTitle }}</span>
+        </v-card-title>
+
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout wrap>
+              <v-flex xs12 sm6 md4>
+                <v-text-field v-model="editedItem.name" label="收费类型代号"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 md4>
+                <v-text-field v-model="editedItem.calories" label="收费类型名称"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 md4>
+                <v-text-field v-model="editedItem.fat" label="门诊收费标准"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 md4>
+                <v-text-field v-model="editedItem.carbs" label="住院收费标准"></v-text-field>
+              </v-flex>
+
+            </v-layout>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+          <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+  </div>
 </template>
 <script>
   export default {
     data: () => ({
+      searchName: '',
       dialog: false,
-      addModel: false,
-      title: '课程添加',
-      disable: false,
-      formItem: {
-        coursename: '',
-        coursekind: '理科',
-        coursetype: '必修',
-        credit: ''
-      },
       headers: [
         {
-          text: 'Dessert (100g serving)',
+          text: '收费类型代号',
           align: 'left',
           sortable: false,
           value: 'name'
         },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Actions', value: 'name', sortable: false }
+        { text: '收费类型名称', value: 'calories' },
+        { text: '门诊收费标准', value: 'fat' },
+        { text: '住院收费标准 ', value: 'carbs' },
+        { text: '操作', value: 'name', sortable: false }
       ],
       desserts: [],
       editedIndex: -1,
       editedItem: {
         name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0
+        calories: '',
+        fat: '',
+        carbs: '',
+
       },
       defaultItem: {
         name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0
+        calories: '',
+        fat: '',
+        carbs: '',
+
       }
     }),
 
     computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+        return this.editedIndex === -1 ? '登记表' : 'Edit Item'
       }
     },
 
@@ -138,75 +150,54 @@
       initialize () {
         this.desserts = [
           {
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0
+            name: '1',
+            calories: '手术',
+            fat: '200',
+            carbs: '500',
           },
           {
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3
+            name: '10',
+            calories: '挂号',
+            fat: '200',
+            carbs: '500',
           },
           {
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0
+            name: '2',
+            calories: '挂号',
+            fat: '200',
+            carbs: '500',
           },
           {
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3
+            name: '3',
+            calories: '手术',
+            fat: '200',
+            carbs: '500',
           },
           {
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9
+            name: '6',
+            calories: '手术',
+            fat: '200',
+            carbs: '500',
           },
           {
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0
+            name: '4',
+            calories: '手术',
+            fat: '200',
+            carbs: '500',
           },
           {
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0
+            name: '5',
+            calories: '手术',
+            fat: '200',
+            carbs: '500',
           },
           {
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5
+            name: '9',
+            calories: '手术',
+            fat: '200',
+            carbs: '500',
           },
-          {
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9
-          },
-          {
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7
-          }
+
         ]
       },
 
@@ -215,15 +206,11 @@
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
-      handleAdd() {
-        this.title = '课程添加'
-        this.disable = false
-        this.addModel = true
-      },
 
       deleteItem (item) {
         const index = this.desserts.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
+        confirm('确认删除?') && this.desserts.splice(index, 1)
+        this.$Message.success('删除成功');
       },
 
       close () {
@@ -233,21 +220,27 @@
           this.editedIndex = -1
         }, 300)
       },
+      searchByName() {
+        this.tableData = this.tableData.filter(item => {
+          if (item.stuname === this.searchName) {
+            return item
+          }
+        })},
 
       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          this.$Message.success('操作成功');
         } else {
           this.desserts.push(this.editedItem)
+          this.$Message.success('操作成功');
         }
         this.close()
       }
+
     }
   }
 </script>
 <style>
-  .vlog{
-    align-content: center;
-    height: 500px;
-  }
+
 </style>

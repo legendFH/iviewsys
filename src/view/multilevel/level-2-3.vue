@@ -1,273 +1,249 @@
-
-<template>
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <div>
-    <Card>
-      <div style="margin-bottom: 10px;">
-        <Input placeholder="输入关键字搜索" v-model="searchValue" style="width: 200px" @keydown.enter.native="handleSearch"/>&nbsp;
-        <Button @click="handleSearch" type="primary">
-          <Icon type="md-search"/>
-          搜索
-        </Button>&nbsp;
-        <Button @click="handleAdd" type="success">
-          <Icon type="ios-add"/>
-          添加
-        </Button>&nbsp;
-        <Button @click="handleDelete" type="error">
-          <Icon type="md-trash"/>
-          批量删除
-        </Button>&nbsp;
-        <Button style="position: absolute;right: 20px" @click="exportData" type="warning">
-          <Icon type="ios-download-outline"></Icon>
-          导出
-        </Button>
-      </div>
-      <Table border ref="table" :columns="columns7" :data="data6" :stripe="true" :border="false" :loading="loading"
-             @on-selection-change="onSelectionChange"></Table>
-      <div style="margin: 10px;overflow: hidden">
-        <div style="float: right;">
-          <Page :total="total" :current="current" :page-size="pageSize" show-sizer show-total @on-change="handlePage"
-                @on-page-size-change='handlePageSize'></Page>
-        </div>
-      </div>
-    </Card>
-    <Modal v-model="addModel" :title="title" footer-hide @on-cancel="addCanael">
-      <Form :model="formItem" ref="formItem" :label-width="80" :rules="ruleValidate">
-        <FormItem label="课程名称" prop="coursename">
-          <Input :disabled="disable" v-model="formItem.coursename" placeholder="请输入课程名称"></Input>
-        </FormItem>
-        <FormItem label="所属科目">
-          <Select v-model="formItem.coursekind">
-            <Option value="理科">理科</Option>
-            <Option value="文科">文科</Option>
-          </Select>
-        </FormItem>
-        <FormItem label="课程类型">
-          <Select v-model="formItem.coursetype">
-            <Option value="必修">必修</Option>
-            <Option value="选修">选修</Option>
-          </Select>
-        </FormItem>
-        <FormItem label="学分" prop="credit">
-          <Input v-model="formItem.credit" placeholder="请输入学分"></Input>
-        </FormItem>
-        <FormItem>
-          <Button @click="addAndUpdate" type="primary">Submit</Button>
-          <Button style="margin-left: 8px">Cancel</Button>
-        </FormItem>
-      </Form>
-    </Modal>
+    <v-toolbar flat color="white">
+      <v-toolbar-title>医疗卡管理</v-toolbar-title>
+      <v-divider
+        class="mx-2"
+        inset
+        vertical
+      ></v-divider>
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="searchName"
+        append-icon="search"
+        label=" 输入关键词搜索"
+        single-line
+        hide-details
+      ></v-text-field>
+
+    </v-toolbar>
+
+    <v-data-table
+      :headers="headers"
+      :items="desserts"
+      :search="searchName"
+      class="elevation-1"
+    >
+      <template v-slot:items="props">
+        <td>{{ props.item.name }}</td>
+        <td class="text-xs-left">{{ props.item.calories }}</td>
+        <td class="text-xs-left">{{ props.item.fat }}</td>
+        <td class="text-xs-left">{{ props.item.carbs }}</td>
+        <td class="text-xs-left">{{ props.item.protein }}</td>
+        <td class="justify-center layout px-0">
+          <v-icon
+            small
+            class="mr-2"
+            @click="editItem(props.item)"
+          >
+            edit
+          </v-icon>
+          <v-icon
+            small
+            @click="deleteItem(props.item)"
+          >
+            delete
+          </v-icon>
+        </td>
+      </template>
+      <template v-slot:no-data>
+        <v-btn color="primary" @click="initialize">Reset</v-btn>
+      </template>
+      <template v-slot:pageText="props">
+        第{{ parseInt(props.pageStop /props.itemsLength) +1}}页，共{{ Math.ceil(props.itemsLength /5)}}页 {{ props.itemsLength }}条数据
+        <!--        Lignes {{ props.pageStart }} - {{ props.pageStop }} de {{ props.itemsLength }}-->
+      </template>
+
+    </v-data-table>
+    <v-dialog v-model="dialog" max-width="500px">
+      <template v-slot:activator="{ on }">
+        <v-btn color="primary" dark class="mb-2" v-on="on">添加</v-btn>
+
+      </template>
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{ formTitle }}</span>
+        </v-card-title>
+
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout wrap>
+              <v-flex xs12 sm6 md4>
+                <v-text-field v-model="editedItem.name" label="医疗卡号"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 md4>
+                <v-text-field v-model="editedItem.calories" label="追加日期"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 md4>
+                <v-text-field v-model="editedItem.fat" label="金额"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 md4>
+                <v-text-field v-model="editedItem.carbs" label="余额"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6 md4>
+                <v-text-field v-model="editedItem.protein" label="操作员号"></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+          <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
   </div>
 </template>
 <script>
-  import qs from 'qs'
-
   export default {
-    name: 'level_2_3',
-    data() {
-      return {
-        columns7: [
-          {
-            type: 'selection',
-            width: 60,
-            align: 'center'
-          },
-          {
-            title: '课程ID',
-            key: 'courseid'
-          },
-          {
-            title: '课程名称',
-            key: 'coursename'
-          },
-          {
-            title: '所属科目',
-            key: 'coursekind'
-          },
-          {
-            title: '课程类型',
-            key: 'coursetype'
-          },
-          {
-            title: '学分',
-            key: 'credit'
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 150,
-            align: 'center',
-            render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    icon: 'ios-create-outline'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.show(params.index)
-                    }
-                  }
-                }),
-                h('Button', {
-                  props: {
-                    type: 'error',
-                    icon: 'md-trash'
-                  },
-                  on: {
-                    click: () => {
-                      this.remove(params.index)
-                    }
-                  }
-                })
-              ]);
-            }
-          }
-        ],
-        data6: [],
-        searchValue: '',
-        loading: false,
-        addModel: false,
-        current: 1,
-        total: 0,
-        pageSize: 10,
-        title: '课程添加',
-        disable: false,
-        formItem: {
-          coursename: '',
-          coursekind: '理科',
-          coursetype: '必修',
-          credit: ''
+    data: () => ({
+      searchName: '',
+      dialog: false,
+      headers: [
+        {
+          text: '医疗卡号',
+          align: 'left',
+          sortable: false,
+          value: 'name'
         },
-        //表单验证
-        ruleValidate: {
-          coursename: [{required: true, message: '课程名称不能为空', trigger: 'blur'}],
-          credit: [{required: true, message: '学分不能为空', trigger: 'blur'}]
-        }
+        { text: '追加日期', value: 'calories' },
+        { text: '金额', value: 'fat' },
+        { text: '余额 ', value: 'carbs' },
+        { text: '操作员号', value: 'protein' },
+        { text: '操作', value: 'name', sortable: false }
+      ],
+      desserts: [],
+      editedIndex: -1,
+      editedItem: {
+        name: '',
+        calories: '',
+        fat: '',
+        carbs: '',
+        protein: ''
+      },
+      defaultItem: {
+        name: '',
+        calories: '',
+        fat: '',
+        carbs: '',
+        protein: ''
+      }
+    }),
+
+    computed: {
+      formTitle () {
+        return this.editedIndex === -1 ? '添加' : 'Edit Item'
       }
     },
+
+    watch: {
+      dialog (val) {
+        val || this.close()
+      }
+    },
+
+    created () {
+      this.initialize()
+    },
+
     methods: {
-      //修改
-      show(index) {
-        this.formItem = {
-          coursename: this.data6[index].coursename,
-          coursekind: this.data6[index].coursekind,
-          coursetype: this.data6[index].coursetype,
-          credit: this.data6[index].credit,
-        }
-        this.title = '课程修改'
-        this.disable = true
-        this.addModel = true
-      },
-      //删除
-      remove(index) {
-        this.$Modal.confirm({
-          title: `确定要删除${this.data6[index].coursename}吗？`,
-          onOk: () => {
-            this.loading = true
-            const url = '/deleteCourse'
-            this.$axios.get(url, {params: {id: this.data6[index].courseid}})
-              .then(res => {
-                this.$Notice.success({title: res.data, duration: 2})
-                this.changePage();
-                this.loading = false
-              })
-              .catch(res => {
-                console.log(res)
-              })
+      initialize () {
+        this.desserts = [
+          {
+            name: '0001',
+            calories: '2019-6-2',
+            fat: '789',
+            carbs: '78',
+            protein: '4556'
           },
-          onCancel: () => {
-            //this.$Message.info('Clicked cancel');
+          {
+            name: '0002',
+            calories: '2019-6-2',
+            fat: '453743',
+            carbs: '20',
+            protein: '4556'
+          },
+          {
+            name: '0003',
+            calories: '2019-6-2',
+            fat: '1000000',
+            carbs: '50',
+            protein: '4556'
+          },
+          {
+            name: '0004',
+            calories: '2019-6-2',
+            fat: '100',
+            carbs: '20',
+            protein: '4556'
+          },
+          {
+            name: '0005',
+            calories: '2019-6-2',
+            fat: '450',
+            carbs: '200',
+            protein: '4556'
+          },
+          {
+            name: '0006',
+            calories: '2019-6-2',
+            fat: '5000',
+            carbs: '500',
+            protein: '4556'
+          },
+          {
+            name: '0007',
+            calories: '2019-6-2',
+            fat: '1000',
+            carbs: '500',
+            protein: '4556'
+          },
+        ]
+      },
+
+      editItem (item) {
+        this.editedIndex = this.desserts.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialog = true
+      },
+
+      deleteItem (item) {
+        const index = this.desserts.indexOf(item)
+        confirm('确认删除?') && this.desserts.splice(index, 1)
+        this.$Message.success('删除成功');
+      },
+
+      close () {
+        this.dialog = false
+        setTimeout(() => {
+          this.editedItem = Object.assign({}, this.defaultItem)
+          this.editedIndex = -1
+        }, 300)
+      },
+      searchByName() {
+        this.tableData = this.tableData.filter(item => {
+          if (item.stuname === this.searchName) {
+            return item
           }
-        });
-      },
+        })},
 
-      //查询方法
-      changePage() {
-        this.loading = true
-        const url = '/searchCourse'
-        this.$axios.get(url, {params: {name: this.searchValue, page: this.current, limit: this.pageSize}})
-          .then(res => {
-            console.log(res.data)
-            this.data6 = res.data.rows
-            this.total = res.data.count
-            this.loading = false
-          })
-          .catch(res => {
-            console.log(res)
-          })
-      },
-
-      //添加修改方法
-      addAndUpdate() {
-        this.$refs.formItem.validate((valid) => {
-          if (valid) { // 步骤1
-            this.loading = true
-            //判断此时是添加还是修改
-            let url = '/updateCourse'
-
-            if (this.title === '课程添加') {
-              url = '/insertCourse'
-            }
-            this.$axios.post(url, qs.stringify(this.formItem))
-              .then(res => {
-                this.$Notice.info({
-                  title: res.data
-                });
-                this.changePage();
-                this.loading = false
-              })
-              .catch(res => {
-                console.log(res)
-              })
-            this.addModel = false
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      },
-      onSelectionChange(selection) {
-        console.log(selection)
-      },
-      exportData() {
-        this.$refs.table.exportCsv({
-          filename: 'The original data'
-        });
-      },
-      handleSearch() {
-        this.changePage();
-      },
-      handleAdd() {
-        this.title = '课程添加'
-        this.disable = false
-        this.addModel = true
-      },
-      handleDelete() {
-
-      },
-      handlePage(value) {
-        this.current = value
-        this.changePage();
-      },
-      handlePageSize(value) {
-        this.pageSize = value
-        this.changePage();
-      },
-      addCanael() {
-        this.formItem = {
-          coursename: '',
-          coursekind: '理科',
-          coursetype: '必修',
-          credit: ''
+      save () {
+        if (this.editedIndex > -1) {
+          Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          this.$Message.success('操作成功');
+        } else {
+          this.desserts.push(this.editedItem)
+          this.$Message.success('操作成功');
         }
+        this.close()
       }
-    },
-    mounted() {
-      this.changePage();
+
     }
   }
 </script>
+<style>
+
+</style>
