@@ -16,7 +16,7 @@
           导出
         </Button>
       </div>
-      <Table border ref="table" :columns="columns7" :data="data7" :stripe="true" :border="false" :loading="loading"
+      <Table border ref="table" :columns="columns7" :data="historyData" :stripe="true" :border="false" :loading="loading"
              @on-selection-change="onSelectionChange"></Table>
       <div style="margin: 10px;overflow: hidden">
         <div style="float: right;">
@@ -116,11 +116,14 @@ export default {
         }
       ],
       data7: [],
+      historyData: [],
       searchValue: '',
       loading: false,
       addModel: false,
-      current: 1,
+      current: 1, // 当前页数
+      // 总条数
       total: 0,
+      // 每页显示条数
       pageSize: 10,
       disable: false,
       hidden: false,
@@ -182,7 +185,13 @@ export default {
           console.log(res.data)
           this.data7 = res.data.data
           this.total = res.data.data.length
-          this.loading = false
+          if (this.total < this.pageSize) {
+            this.historyData = this.data7
+            this.loading = false
+          } else {
+            this.historyData = this.data7.slice(0, this.pageSize)
+            this.loading = false
+          }
         })
         .catch(res => {
           console.log(res)
@@ -235,12 +244,22 @@ export default {
     handleDelete () {
 
     },
-    handlePage (value) {
-      this.current = value
-      this.changePage()
+    handlePage (index) {
+      this.current = index
+      let _start = (index - 1) * this.pageSize
+      console.log(_start)
+      let _end = index * this.pageSize
+      console.log(_end)
+      this.historyData = this.data7.slice(_start, _end)
+      console.log(this.historyData)
+      // this.changePage()
     },
-    handlePageSize (value) {
-      this.pageSize = value
+    handlePageSize (index) {
+      // 当前展示条数
+      this.pageSize = index
+      let _start = (this.current - 1) * index
+      let _end = this.current * index
+      this.historyData = this.data7.slice(_start, _end)
       this.changePage()
     },
     addCanael () {

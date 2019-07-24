@@ -16,8 +16,8 @@
           导出
         </Button>
       </div>
-      <Table border ref="table" :columns="columns7" :data="data6" :stripe="true" :border="false" :loading="loading"
-             @on-selection-change="onSelectionChange"></Table>
+      <Table border ref="table" :columns="columns7" :data="historyData" :stripe="true" :border="false"
+             :loading="loading" @on-selection-change="onSelectionChange"></Table>
       <div style="margin: 10px;overflow: hidden">
         <div style="float: right;">
           <Page :total="total" :current="current" :page-size="pageSize" show-sizer show-total @on-change="handlePage"
@@ -57,15 +57,10 @@
 import qs from 'qs'
 
 export default {
-  name: 'level_2_3',
+  name: 'level_2_7',
   data () {
     return {
       columns7: [
-        {
-          type: 'selection',
-          width: 60,
-          align: 'center'
-        },
         { title: '供应商代码', key: 'comNo' },
         { title: '供应商名称', key: 'comName' },
         { title: '地ַ止', key: 'comAddress' },
@@ -109,6 +104,7 @@ export default {
         }
       ],
       data6: [],
+      historyData: [],
       searchValue: '',
       loading: false,
       addModel: false,
@@ -174,6 +170,13 @@ export default {
           this.data6 = res.data.data
           this.total = res.data.data.length
           this.loading = false
+          if (this.total < this.pageSize) {
+            this.historyData = this.data6
+            this.loading = false
+          } else {
+            this.historyData = this.data6.slice(0, this.pageSize)
+            this.loading = false
+          }
         })
         .catch(res => {
           console.log(res)
@@ -226,12 +229,22 @@ export default {
     handleDelete () {
 
     },
-    handlePage (value) {
-      this.current = value
-      this.changePage()
+    handlePage (index) {
+      this.current = index
+      let _start = (index - 1) * this.pageSize
+      console.log(_start)
+      let _end = index * this.pageSize
+      console.log(_end)
+      this.historyData = this.data6.slice(_start, _end)
+      console.log(this.historyData)
+      // this.changePage()
     },
-    handlePageSize (value) {
-      this.pageSize = value
+    handlePageSize (index) {
+      // 当前展示条数
+      this.pageSize = index
+      let _start = (this.current - 1) * index
+      let _end = this.current * index
+      this.historyData = this.data6.slice(_start, _end)
       this.changePage()
     },
     addCanael () {
