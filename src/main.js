@@ -8,7 +8,7 @@ import iView from 'iview'
 import Vuetify from 'vuetify'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-
+import axios from 'axios'
 Vue.use(ElementUI);
 import i18n from '@/locale'
 import config from '@/config'
@@ -17,6 +17,12 @@ import installPlugin from '@/plugin'
 import 'iview/dist/styles/iview.css'
 import './index.less'
 import '@/assets/icons/iconfont.css'
+
+import global_ from './Base.vue'
+Vue.prototype.$axios = axios;
+Vue.prototype.GLOBAL = global_;
+axios.defaults.baseURL = global_.BASE_URL;
+
 /* eslint-disable */
 if (process.env.NODE_ENV !== 'production') require('@/mock')
 Vue.use(iView, {

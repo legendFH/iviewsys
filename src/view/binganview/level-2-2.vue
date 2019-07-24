@@ -153,7 +153,9 @@
         </tr>
       </table>
       <br>
-
+      <div style="background: white;width: 10%;align-self: center;align-items: center;align-content: center;justify-items: center;justify-content: center">
+        <Button type="primary" long>提交</Button>
+      </div>
     </Card>
   </div>
 

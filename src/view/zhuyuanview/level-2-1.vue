@@ -1,164 +1,230 @@
 <template>
-  <div class="table">
-    <Card style="width:100%">
-    <h1 style="background: white;text-align: center;line-height: 40px;width: 100%">入院病人基本资料登记表</h1>
-    <table style="width: 100%">
-      <tr>
-        <td style="width: 100px"> 卡号</td>
-        <td><Input type="text"></Input></td>
-        <td style="width: 100px;">住院号</td>
-        <td><Input type="text"></Input></td>
-        <td style="width: 100px">费别</td>
-        <td><select name="" id="">
-          <option value="">自费</option>
-          <option value="">代缴费</option>
-        </select></td>
-        <td style="width: 100px">入院日期</td>
-        <td><Input type="date"></Input></td>
-      </tr>
-      <tr>
-        <td>科别</td>
-        <td><Input type="text"></Input></td>
-        <td>床号</td>
-        <td><Input type="text"></Input></td>
-      </tr>
-      <tr>
-        <td>入院方式</td>
-        <td><select name="" id="">
-          <option value="">普通入院</option>
-          <option value="">转院</option>
-        </select></td>
-        <td>疾病诊断</td>
-        <td><Input type="text"></Input></td>
-        <td>ICD-9编码</td>
-        <td><Input type="text"></Input></td>
+  <el-container style="height: 100%">
+    <Card>
+    <el-header>
+      <h2 style="text-align: center">入院病人基本资料登记表</h2>
+    </el-header>
+    <el-main class="table">
+      <form ref="form">
+        <table style="width: 100%">
+          <tr>
+            <td style="width: 100px"> 卡号</td>
+            <td><Input type="text" v-model="patientBase.staffNo"/></td>
+            <td style="width: 100px">住院号</td>
+            <td><Input type="text" v-model="patientBase.patientNo"/></td>
+            <td style="width: 100px">费别</td>
+            <td><select name="" id="" v-model="patientBase.costType">
+              <option value="">自费</option>
+              <option value="">代缴费</option>
+            </select></td>
+            <td style="width: 105px">入院日期</td>
+            <td><Input type="date" v-model="patientBase.inDate"/></td>
+          </tr>
+          <tr>
+            <td>科别</td>
+            <td><Input type="text" v-model="patientBase.section"/></td>
+            <td>床号</td>
+            <td><Input type="text" v-model="patientBase.bedNo"/></td>
+          </tr>
+          <tr>
+            <td>入院方式</td>
+            <td><select name="" id="" v-model="patientBase.costMode">
+              <option value="">普通入院</option>
+              <option value="">转院</option>
+            </select></td>
+            <td>疾病诊断</td>
+            <td><Input type="text" v-model="patientBase.diagnoseName"/></td>
+            <td>ICD-9编码</td>
+            <td><Input type="text" v-model="patientBase.icd9"/></td>
 
-      </tr>
+          </tr>
 
-      <tr>
-        <td>
-          姓名
-        </td>
-        <td><Input type="text"></Input></td>
-        <td>性别</td>
-        <td><select name="" id="">
-          <option value="">男</option>
-          <option value="">女</option>
-        </select></td>
-        <td>出生日期</td>
-        <td><Input type="date"></Input></td>
-        <td>婚姻</td>
-        <td><Input type="text"></Input></td>
-      </tr>
-      <tr>
-        <td>职业</td>
-        <td><Input type="text"></Input></td>
-        <td>职称</td>
-        <td><Input type="text"></Input></td>
-        <td>民族</td>
-        <td><Input type="text"></Input></td>
-        <td>国籍</td>
-        <td><Input type="text"></Input></td>
-      </tr>
-      <tr>
-        <td>身份证号</td>
-        <td><Input type="text"></Input></td>
-        <td>其他证件</td>
-        <td><Input type="text"></Input></td>
-        <td>医疗证号</td>
-        <td><Input type="text"></Input></td>
-        <td>电话</td>
-        <td><Input type="text"></Input></td>
-        <td style="width: 100px">家庭电话</td>
-        <td><Input type="text"></Input></td>
-      </tr>
-      <tr>
-        <td>现住地址</td>
-        <td><Input type="text"></Input></td>
-        <td>户口地址</td>
-        <td><Input type="text"></Input></td>
+          <tr>
+            <td>
+              姓名
+            </td>
+            <td><Input type="text" v-model="patientBase.patientName"/></td>
+            <td>性别</td>
+            <td><select name="" id="" v-model="patientBase.patientSex">
+              <option value="">男</option>
+              <option value="">女</option>
+            </select></td>
+            <td>出生日期</td>
+            <td><Input type="date" v-model="patientBase.birthDate"/></td>
+            <td>婚姻</td>
+            <td><Input type="text" v-model="patientBase.marry"/></td>
+          </tr>
+          <tr>
+            <td>职业</td>
+            <td><Input type="text" v-model="patientBase.occupation"/></td>
+            <td>职称</td>
+            <td><Input type="text" v-model="patientBase.titleName"/></td>
+            <td>民族</td>
+            <td><Input type="text"/></td>
+            <td>国籍</td>
+            <td><Input type="text" v-model="patientBase.nationality"/></td>
+          </tr>
+          <tr>
+            <td>身份证号</td>
+            <td><Input type="text" v-model="patientBase.capacityNo"/></td>
+            <td>其他证件</td>
+            <td><Input type="text"/></td>
+            <td>医疗证号</td>
+            <td><Input type="text"/></td>
+            <td>电话</td>
+            <td><Input type="text" v-model="patientBase.heTel"/></td>
+            <td style="width: 100px">家庭电话</td>
+            <td><Input type="text"/></td>
+          </tr>
+          <tr>
+            <td>现住地址</td>
+            <td><Input type="text" v-model="patientBase.homeAdder"/></td>
+            <td>户口地址</td>
+            <td><Input type="text" /></td>
 
-      </tr>
-      <tr>
-        <td>工作单位</td>
-        <td><Input type="text"></Input></td>
-        <td>电话</td>
-        <td><Input type="text"></Input></td>
-      </tr>
-      <tr>
-        <td>籍贯</td>
-        <td><Input type="text"></Input></td>
-        <td>邮政编码</td>
-        <td><Input type="text"></Input></td>
-      </tr>
+          </tr>
+          <tr>
+            <td>工作单位</td>
+            <td><Input type="text" v-model="patientBase.workPlace"/></td>
+            <td>电话</td>
+            <td><Input type="text" /></td>
+          </tr>
+          <tr>
+            <td>籍贯</td>
+            <td><Input type="text" v-model="patientBase.nativePlace"/></td>
+            <td>邮政编码</td>
+            <td><Input type="text" /></td>
+          </tr>
 
-      <tr>
-        <td>联系人</td>
-        <td><Input type="text"></Input></td>
-        <td>关系</td>
-        <td><Input type="text"></Input></td>
-        <td>电话</td>
-        <td><Input type="text"></Input></td>
-        <td>联系人地址</td>
-        <td><Input type="text"></Input></td>
-      </tr>
-      <tr>
-        <td>出院日期</td>
-        <td><Input type="text"></Input></td>
-      </tr>
+          <tr>
+            <td>联系人</td>
+            <td><Input type="text" v-model="patientBase.heName"/></td>
+            <td>关系</td>
+            <td><Input type="text" v-model="patientBase.relation"/></td>
+            <td>电话</td>
+            <td><Input type="text" v-model="patientBase.heTel"/></td>
+            <td>联系人地址</td>
+            <td><Input type="text" /></td>
+          </tr>
+          <tr>
+            <td>出院日期</td>
+            <td><Input type="text" v-model="patientBase.outDate"/></td>
+          </tr>
 
-      <tr>
-        <td>个人分担</td>
-        <td><Input type="text"></Input></td>
-      </tr>
-      <tr>
-        <td>缴费方式</td>
-        <td>
-          <select name="" id="">
-            <option value="">现金</option>
-            <option value="">银行卡</option>
-          </select>
-        </td>
-        <td>预交款</td>
-        <td><Input type="text"></Input></td>
-        <td>卡号</td>
-        <td><Input type="text"></Input></td>
-      </tr>
-    </table>
-      <br>
-
-    <div style="background: white;width: 100%;align-self: center;align-items: center;align-content: center;justify-items: center;justify-content: center">
-      <Button type="primary" long>提交</Button>
-    </div>
+          <tr>
+            <td>个人分担</td>
+            <td><Input type="text" v-model="patientBase.patientCost"/></td>
+          </tr>
+          <tr>
+            <td>缴费方式</td>
+            <td>
+              <select name="" id="" v-model="patientBase.settleType">
+                <option value="">现金</option>
+                <option value="">银行卡</option>
+              </select>
+            </td>
+            <td>预交款</td>
+            <td><Input type="text" v-model="patientBase.payMoney"/></td>
+            <td>卡号</td>
+            <td><Input type="text" v-model="patientBase.staffNo"/></td>
+          </tr>
+        </table>
+      </form>
+      <el-row style="margin-top: 30px">
+        <el-col :span="3" :offset="9">
+          <el-button type="primary" @click="query">查看登记信息</el-button>
+        </el-col>
+        <el-col :span="2">
+          <el-button type="primary  " @click="submit">提交</el-button>
+        </el-col>
+        <el-col :span="2">
+          <el-button type="danger" @click="reset">重置</el-button>
+        </el-col>
+      </el-row>
+    </el-main>
     </Card>
-  </div>
+  </el-container>
 
 </template>
 
 <script>
+
+
   export default {
     data() {
       return {
+        patientBase: {
+          patientNo:'',    //住院号
+          inDate:'',    //入院日期
+          patientName:'', //姓名
+          patientSex:'',  //性别
+          birthDate:'',  //出生日期
+          marry:'',    //婚否
+          occupation:'',    //职业
+          titleName:'',    //职称
+          nativePlace:'',  //籍贯
+          nationality:'',    //国籍
+          capacityNo:'',    //身份证号
+          staffNo:'',    //医疗证号
+          workPlace:'',    //工作单位
+          homeAdder:'',    //住址
+          heName:'',    //联系人
+          heTel:'',    //联系人电话
+          relation:'',    //关系
+          costMode:'',    //交费方式
+          patientCost:'',    //个人分担
+          costType:'',    //费别
+          settleType:'',    //结帐方式
+          payMoney:'',    //预交款
+          diagnoseName:'',    //疾病诊断
+          icd9:'',    //ICD-9编码
+          section:'',    //科别
+          bedNo:'',    //床号
+          outDate:'',  //出院日期
+        }
+      }
+    },
+    methods: {
+      query() {
+        this.$router.push("hospitalization-list")
+      },
+      reset(){
+        this.$refs['form'].reset()
+      },
+      submit(){
+        const that=this
+        request({
+          url: `/patient/add`,
+          method: 'post',
+          data:that.patientBase
+        }).then(res=>{
+          this.$message({
+            type: 'success',
+            message: '录入成功!'
+          });
+        }).catch(err=>{
+        })
+
       }
     }
   }
 </script>
+
 <style scoped>
-  .table{
+  .table {
     background: white;
-    width: 100%;
-    font-size: 0.7em;
-    margin-left: 30px;
-    padding-right: 30px;
+
   }
-  .table tr{
+
+  .table tr {
     height: 30px;
   }
-  .table tr td{
+
+  .table tr td {
     width: auto;
     padding-left: 10px;
-    text-align:center;
-    text-justify:distribute-all-lines;
-    text-align-last:justify
+    text-align: center;
+    text-justify: distribute-all-lines;
+    text-align-last: justify
   }
 </style>

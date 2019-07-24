@@ -33,7 +33,6 @@
         <td class="text-xs-left">{{ props.item.fee }}</td>
         <td class="text-xs-left">{{ props.item.piaoju }}</td>
         <td class="text-xs-left">{{ props.item.leibie }}</td>
-        <td class="text-xs-left">{{ props.item.leibie }}</td>
         <td class="text-xs-left">{{ props.item.keshi }}</td>
         <td class="text-xs-left">{{ props.item.jiuzhen }}</td>
         <td class="text-xs-left">{{ props.item.doctor }}</td>

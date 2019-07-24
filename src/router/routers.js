@@ -130,6 +130,13 @@ export default [
         },
         component: () => import('@/view/zhuyuanview/level-2-7.vue')
       },
+      {
+        path: 'hospitalization-list',
+        name: 'hospitalization-list',
+        component: () => import('@/view/zhuyuanview/hospitalization-list'),
+        meta: {title: '入院检索', icon: 'md-funnel',noCache: true},
+        hidden: true
+      },
     ]
 
   },
